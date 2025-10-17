@@ -1,8 +1,9 @@
-import customtkinter as ctk
-import serial
-import serial.tools.list_ports
 import json
+import time
+import serial
 import subprocess
+import customtkinter as ctk
+import serial.tools.list_ports
 from tkinter import messagebox, filedialog
 
 # ============ APP CONFIG ============
@@ -13,8 +14,8 @@ ctk.set_default_color_theme("blue")
 class LEDControllerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("ESP32 LED Controller")
-        self.geometry("500x620")
+        self.title("OptiSync LED Controller")
+        self.geometry("500x660")
         self.minsize(500, 620)
         self.iconbitmap("icon.ico")
 
@@ -26,7 +27,7 @@ class LEDControllerApp(ctk.CTk):
 
     def create_widgets(self):
         # Title
-        self.label_title = ctk.CTkLabel(self, text="ESP32 LED Controller", font=("Arial", 22, "bold"))
+        self.label_title = ctk.CTkLabel(self, text="OptiSync LED Controller", font=("Arial", 22, "bold"))
         self.label_title.pack(pady=15)
 
         # Port selection + connect row
@@ -46,14 +47,14 @@ class LEDControllerApp(ctk.CTk):
 
         # Brightness slider
         self.brightness_slider = ctk.CTkSlider(self, from_=0, to=255, number_of_steps=256, command=self.on_brightness_change)
-        self.brightness_slider.pack(pady=10)
-        ctk.CTkLabel(self, text="Brightness").pack()
+        self.brightness_slider.pack(pady=(10, 5))
+        ctk.CTkLabel(self, text="Brightness").pack(pady=(0, 15))
 
         # Speed slider
         self.speed_slider = ctk.CTkSlider(self, from_=0.1, to=5, command=self.on_speed_change)
         self.speed_slider.set(1)
-        self.speed_slider.pack(pady=10)
-        ctk.CTkLabel(self, text="Speed Multiplier").pack()
+        self.speed_slider.pack(pady=(10, 5))
+        ctk.CTkLabel(self, text="Speed Multiplier").pack(pady=(0, 20))
 
         # Color sliders
         self.r_slider = self.create_color_slider("Red")
@@ -67,8 +68,8 @@ class LEDControllerApp(ctk.CTk):
         preset_frame = ctk.CTkFrame(self)
         preset_frame.pack(pady=10)
 
-        presets = ["Rainbow", "Solid", "Random Shift", "Preset 4", "Preset 5", "Preset 6"]
-        rows, cols = 2, 3
+        presets = ["Rainbow", "Solid", "Smooth Shift", "Fire Flicker", "Waves", "Pulse Sync", "Ocean Flow"]
+        rows, cols = 3, 3
         for i, preset in enumerate(presets):
             btn = ctk.CTkButton(preset_frame, text=preset, width=120,
                                 command=lambda p=preset: self.send_preset(p))
@@ -98,9 +99,10 @@ class LEDControllerApp(ctk.CTk):
             self.connect_btn.configure(text="Connected", fg_color="green")
         except Exception as e:
             messagebox.showerror("Connection Error", f"Failed to connect:\n{e}")
-            print("Failed to connect:", e)
+            print("Failed to connect:", e, " Please try reconnecting the cable.")
 
-    # ==== Flash Firmware ====
+  
+
     def flash_firmware(self):
         # Ask user to choose .bin file
         firmware_path = filedialog.askopenfilename(
@@ -120,16 +122,20 @@ class LEDControllerApp(ctk.CTk):
             self.serial_conn.close()
 
         try:
-            # Run esptool.py command
+            # Run esptool.exe command
             messagebox.showinfo("Flashing", "Flashing firmware... Please wait, this may take a few seconds.")
+            esptool_path = "esptool.exe"  # same folder as your app
             subprocess.run([
-                "esptool.py", "--chip", "esp32",
+                esptool_path, "--chip", "esp32",
                 "--port", port, "--baud", "460800",
-                "write_flash", "-z", "0x1000", firmware_path
+                "write-flash", "-z", "0x0", firmware_path
             ], check=True)
-            messagebox.showinfo("Success", "Firmware updated successfully! 🎉")
+
+            time.sleep(2)
+
+            messagebox.showinfo("Success", "Firmware updated successfully!\nPlease reconnect the cable to the USB.")
         except FileNotFoundError:
-            messagebox.showerror("Error", "esptool.py not found. Please install it with:\n\npython -m pip install esptool")
+            messagebox.showerror("Error", "esptool.exe not found. Make sure it's in the same folder as the app.")
         except subprocess.CalledProcessError:
             messagebox.showerror("Error", "Failed to flash firmware.\nMake sure your ESP32 is in bootloader mode.")
 

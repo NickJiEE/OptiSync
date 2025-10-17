@@ -65,37 +65,26 @@ void loop() {
     rainbowOffset = (rainbowOffset + 2 * speedMult);
     if (rainbowOffset > 255) rainbowOffset -= 255;
     delay(30);
+
   } else if (currentPreset == "Solid") {
     for (int i = 0; i < NUM_LEDS; i++) strip.setPixelColor(i, r, g, b);
     strip.show();
     delay(50);
-  } else if (currentPreset == "Random Shift") {
-    smoothRandomShift();
-  }
-}
 
-void smoothRandomShift() {
-  static unsigned long lastChange = 0;
-  static unsigned long lastUpdate = 0;
-  static uint8_t currentR = random(255), currentG = random(255), currentB = random(255);
+  } else if (currentPreset == "Smooth Shift") {
+    smoothShift();
 
-  if (millis() - lastChange > (3000 / speedMult)) {
-    targetR = random(255);
-    targetG = random(255);
-    targetB = random(255);
-    lastChange = millis();
-  }
+  } else if (currentPreset == "Fire Flicker") {
+    fireFlicker();
 
-  if (millis() - lastUpdate > 30) {
-    currentR += (targetR - currentR) * 0.1;
-    currentG += (targetG - currentG) * 0.1;
-    currentB += (targetB - currentB) * 0.1;
+  } else if (currentPreset == "Waves") {
+    waves();
 
-    for (int i = 0; i < NUM_LEDS; i++) {
-      strip.setPixelColor(i, currentR, currentG, currentB);
-    }
-    strip.show();
-    lastUpdate = millis();
+  } else if (currentPreset == "Pulse Sync") {
+    pulseSync();
+
+  } else if (currentPreset == "Ocean Flow") {
+    oceanFlow();
   }
 }
 
@@ -155,4 +144,96 @@ void saveSettings() {
   prefs.putUInt("b", b);
   prefs.end();
   Serial.println("Settings saved!");
+}
+
+// ===== PRESETS =====
+void smoothShift() {
+  static float hue = 0;
+  hue += 0.5 * speedMult;  // increase for faster color change
+  if (hue >= 360) hue -= 360;
+
+  // Convert HSV to RGB (simple function below)
+  uint8_t rr, gg, bb;
+  HSVtoRGB(hue, 1.0, 1.0, rr, gg, bb);
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    strip.setPixelColor(i, rr, gg, bb);
+  }
+  strip.show();
+  delay(30);
+}
+
+void fireFlicker() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    int flicker = random(180, 255);
+    int rVal = flicker;
+    int gVal = random(flicker * 0.3, flicker * 0.6);
+    int bVal = random(0, flicker * 0.1);
+    strip.setPixelColor(i, rVal, gVal, bVal);
+  }
+  strip.show();
+  delay(random(40, 80) / speedMult);
+}
+
+void waves() {
+    static float pos = 0;          // current position in "wave"
+    static float dir = 1;          // 1 = forward, -1 = backward
+    float step = 0.2 * speedMult;  // controls speed
+
+    // move position
+    pos += dir * step;
+    if (pos >= NUM_LEDS - 1) { dir = -1; pos = NUM_LEDS - 1; } // reflect
+    if (pos <= 0) { dir = 1; pos = 0; }                          // reflect
+
+    // draw sine brightness
+    for (int i = 0; i < NUM_LEDS; i++) {
+        float distance = abs(i - pos);
+        float intensity = max(0.0f, cos(distance * 3.14159 / 2)); // peak at pos, drops off
+        strip.setPixelColor(i, r * intensity, g * intensity, b * intensity);
+    }
+
+    strip.show();
+    delay(30);
+}
+
+void pulseSync() {
+  static float angle = 0;
+  angle += 0.05 * speedMult;
+  float intensity = (sin(angle) + 1.0) / 2.0 * 0.6 + 0.4;  // 0.4 → 1.0
+  for (int i = 0; i < NUM_LEDS; i++) {
+    strip.setPixelColor(i, r * intensity, g * intensity, b * intensity);
+  }
+  strip.show();
+  delay(30);
+}
+
+void oceanFlow() {
+  static float hue = 180; // ocean blue
+    hue += 0.05 * speedMult;
+    if (hue > 200) hue = 180;
+
+    for (int i = 0; i < NUM_LEDS; i++) {
+        float intensity = 0.5 + 0.5 * ((float)random(50, 101) / 100.0); // mostly bright, some dimmer
+        uint8_t rr, gg, bb;
+        HSVtoRGB(hue, 0.8, 0.6 * intensity, rr, gg, bb); // scale brightness by intensity
+        strip.setPixelColor(i, rr, gg, bb);
+    }
+    strip.show();
+    delay(50 / speedMult); 
+}
+
+void HSVtoRGB(float h, float s, float v, uint8_t &r, uint8_t &g, uint8_t &b) {
+  float c = v * s;
+  float x = c * (1 - abs(fmod(h / 60.0, 2) - 1));
+  float m = v - c;
+  float r1, g1, b1;
+  if (h < 60) { r1 = c; g1 = x; b1 = 0; }
+  else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
+  else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
+  else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
+  else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
+  else { r1 = c; g1 = 0; b1 = x; }
+  r = (r1 + m) * 255;
+  g = (g1 + m) * 255;
+  b = (b1 + m) * 255;
 }
