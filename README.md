@@ -51,8 +51,8 @@ A comprehensive Python-based desktop application built with CustomTkinter (compi
 2. Run `OptiSync.exe` to launch the application
 
 3. Select your ESP32 serial port from the dropdown and click **Connect**, if no available port shown, please make sure necessary drivers are downloaded
-   - [CP210x USB to UART Bridge VCP Drivers](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers)
-   - [CH341 MCU Driver](https://www.wch-ic.com/downloads/ch341ser_exe.html)
+   - <a href="https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers" target="_blank" rel="noopener noreferrer">CP210x USB to UART Bridge VCP Drivers</a>
+   - <a href="https://www.wch-ic.com/downloads/ch341ser_exe.html" target="_blank" rel="noopener noreferrer">CH341 MCU Driver</a>
 
 4. Use the interface to:
    - Drag the brightness slider to control LED intensity
