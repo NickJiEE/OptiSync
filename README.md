@@ -101,17 +101,21 @@ Built on Arduino-compatible C++ using industry-standard libraries:
 ## Project Structure
 
 ```
-OptiSync-Lamp/
-├── firmware/                 # ESP32 Arduino/IDF code
+OptiSync/
+├── firmware/                 # ESP32 Arduino code
+│   └── Arduino/
+│      └── OptiSync_MCU.ino
 ├── software/                 # Python application source
-│   ├── main.py
-│   ├── ui/
-│   ├── serial_comm/
-│   └── esptool_wrapper/
-├── hardware/                 # 3D printing files and schematics
-│   ├── base/
-│   ├── cover/
-│   └── schematics/
+│   ├── build/
+│   ├── OptiSync.py           # Main program code
+│   ├── OptiSync.spec         # pyinstaller specs
+│   └── dist/                 # Release package
+│      ├── OptiSync.py
+│      ├── icon.ico
+│      └── esptool.exe
+├── hardware/                 # 3D printing files
+│   └── CAD models/
+├── designs/                  # Available acrylic board designs
 ├── README.md
 └── LICENSE
 ```
