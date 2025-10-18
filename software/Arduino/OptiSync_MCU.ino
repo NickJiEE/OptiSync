@@ -82,10 +82,8 @@ void loop() {
 
   } else if (currentPreset == "Pulse Sync") {
     pulseSync();
-
-  } else if (currentPreset == "Ocean Flow") {
-    oceanFlow();
   }
+  
 }
 
 void handleTouch() {
@@ -176,24 +174,18 @@ void fireFlicker() {
 }
 
 void waves() {
-    static float pos = 0;          // current position in "wave"
-    static float dir = 1;          // 1 = forward, -1 = backward
-    float step = 0.2 * speedMult;  // controls speed
+  static float phase = 0;
+  phase += 0.2 * speedMult;  // speed of wave motion
+  if (phase > 2 * PI) phase -= 2 * PI;
 
-    // move position
-    pos += dir * step;
-    if (pos >= NUM_LEDS - 1) { dir = -1; pos = NUM_LEDS - 1; } // reflect
-    if (pos <= 0) { dir = 1; pos = 0; }                          // reflect
-
-    // draw sine brightness
-    for (int i = 0; i < NUM_LEDS; i++) {
-        float distance = abs(i - pos);
-        float intensity = max(0.0f, cos(distance * 3.14159 / 2)); // peak at pos, drops off
-        strip.setPixelColor(i, r * intensity, g * intensity, b * intensity);
-    }
-
-    strip.show();
-    delay(30);
+  for (int i = 0; i < NUM_LEDS; i++) {
+    // create sine wave motion along strip
+    float wave = sin((i / (float)NUM_LEDS) * 2 * PI + phase);
+    float intensity = (wave + 1.0) / 2.0;  // normalize 0–1
+    strip.setPixelColor(i, r * intensity, g * intensity, b * intensity);
+  }
+  strip.show();
+  delay(30);
 }
 
 void pulseSync() {
@@ -205,21 +197,6 @@ void pulseSync() {
   }
   strip.show();
   delay(30);
-}
-
-void oceanFlow() {
-  static float hue = 180; // ocean blue
-    hue += 0.05 * speedMult;
-    if (hue > 200) hue = 180;
-
-    for (int i = 0; i < NUM_LEDS; i++) {
-        float intensity = 0.5 + 0.5 * ((float)random(50, 101) / 100.0); // mostly bright, some dimmer
-        uint8_t rr, gg, bb;
-        HSVtoRGB(hue, 0.8, 0.6 * intensity, rr, gg, bb); // scale brightness by intensity
-        strip.setPixelColor(i, rr, gg, bb);
-    }
-    strip.show();
-    delay(50 / speedMult); 
 }
 
 void HSVtoRGB(float h, float s, float v, uint8_t &r, uint8_t &g, uint8_t &b) {

@@ -16,7 +16,7 @@ class LEDControllerApp(ctk.CTk):
         super().__init__()
         self.title("OptiSync LED Controller")
         self.geometry("500x660")
-        self.minsize(500, 620)
+        self.minsize(500, 630)
         self.iconbitmap("icon.ico")
 
         # Serial connection (not connected yet)
@@ -68,7 +68,7 @@ class LEDControllerApp(ctk.CTk):
         preset_frame = ctk.CTkFrame(self)
         preset_frame.pack(pady=10)
 
-        presets = ["Rainbow", "Solid", "Smooth Shift", "Fire Flicker", "Waves", "Pulse Sync", "Ocean Flow"]
+        presets = ["Rainbow", "Solid", "Smooth Shift", "Fire Flicker", "Waves", "Pulse Sync"]
         rows, cols = 3, 3
         for i, preset in enumerate(presets):
             btn = ctk.CTkButton(preset_frame, text=preset, width=120,
