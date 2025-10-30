@@ -1,5 +1,6 @@
 # OptiSync
 
+![Project Demo](images/demo.jpg)
 A sophisticated 3D optics LED lamp that transforms etched acrylic designs into mesmerizing light displays through edge lighting and intelligent control systems.
 
 ## Overview
