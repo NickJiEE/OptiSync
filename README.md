@@ -116,6 +116,7 @@ OptiSync/
 ├── hardware/                 # 3D printing files
 │   └── CAD models/
 ├── designs/                  # Available acrylic board designs
+├── images/
 ├── README.md
 └── LICENSE
 ```
@@ -145,7 +146,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Related Projects
 
-- [Modular-Power-Hub](https://github.com/NickJiEE/Modular-Power-Hub) - Universal multi-input power distribution board used in this project
+- [Modular-Power-Hub](https://github.com/NickJiEE/Modular-Power-Hub) - Universal multi-input power distribution board used in this project (optional)
 
 ---
 
